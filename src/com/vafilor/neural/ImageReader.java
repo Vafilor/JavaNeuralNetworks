@@ -35,7 +35,6 @@ public class ImageReader
 
             List<Matrix> imagesAsVectors = new ArrayList<>(images);
 
-
             input.read(number);
 
             int rows = getInteger(number);
@@ -44,24 +43,23 @@ public class ImageReader
 
             int columns = getInteger(number);
 
-            Matrix image = new Matrix(rows * columns, 1);
+            Matrix image = null;
 
-            byte[] pixelValue = new byte[1];
+            byte[] pixelValues = new byte[rows * columns * images];
 
-            int pixelsRead = 0;
+            input.read(pixelValues);
 
-            while( input.read(pixelValue) != -1)
+            int pixelsInImage = rows * columns;
+
+            for(int i = 0; i < pixelValues.length; i += pixelsInImage)
             {
-                image.setEntry(pixelsRead, 0, (int)(pixelValue[0] & 0xFF));
+                image = new Matrix(rows * columns, 1);
 
-                pixelsRead++;
-
-                if(pixelsRead == image.getRows())
-                {
-                    imagesAsVectors.add(image);
-                    image = new Matrix(rows * columns, 1);
-                    pixelsRead = 0;
+                for (int j = 0; j < pixelsInImage; j++) {
+                    image.setEntry(j, 0, pixelValues[i + j] & 0xFF); //We bitwise and here with 0xFF to convert java's signed byte to 'unsigned' byte, which is really an int.
                 }
+
+                imagesAsVectors.add(image);
             }
 
             return imagesAsVectors;

@@ -11,7 +11,7 @@ near future so that I can compare the performance.
 Program Notes
 -------------------
 The Neural Network works, but its a work in progress. Next steps are to clean up the source code, write unit tests, and see if I can't
-speed up loading the image data and neural network code itself. 
+speed up the neural network. 
 
 Also, I'm not getting as good results as Nielson's program, so need to take another look at that.
 

@@ -36,13 +36,17 @@ public class LabelReader
             //Output is number from 0 - 9
             Matrix label = new Matrix(10, 1);
 
-            byte[] numberValue = new byte[1];
+            byte[] numberValues = new byte[labels];
+            input.read(numberValues);
 
-            while( input.read(numberValue) != -1)
+            label.setEntry(numberValues[0], 0, 1);
+            labelsAsVectors.add(label);
+
+            for(int i = 1; i < numberValues.length; i++)
             {
-                label.setEntry(numberValue[0], 0, 1);
-                labelsAsVectors.add(label);
                 label = new Matrix(10, 1);
+                label.setEntry(numberValues[i], 0, 1);
+                labelsAsVectors.add(label);
             }
 
             return labelsAsVectors;
