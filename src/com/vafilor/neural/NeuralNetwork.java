@@ -158,42 +158,14 @@ public class NeuralNetwork
     //TODO change to use pair
     public ArrayList<ArrayList<Matrix>> backprop(Matrix input, Matrix output)
     {
-        ArrayList<Matrix> nabla_b = new ArrayList<>();
+        ArrayList<Matrix> nabla_b = this.createBlankCopy(this.biases);
+		ArrayList<Matrix> nabla_w = this.createBlankCopy(this.weights);
+		
+		Pair<ArrayList<Matrix>, ArrayList<Matrix>> zsAndActivations = this.calculateActivations(input);
 
-        Matrix weight = null;
-        Matrix bias = null;
-
-        for(int i = 0; i < this.biases.size(); i++)
-        {
-            bias = this.biases.get(i);
-            nabla_b.add(new Matrix(bias.getRows(), bias.getColumns()));
-        }
-
-        ArrayList<Matrix> nabla_w = new ArrayList<>();
-
-        for(int i = 0; i < this.weights.size(); i++)
-        {
-            weight = this.weights.get(i);
-            nabla_w.add(new Matrix(weight.getRows(), weight.getColumns()));
-        }
-
-
-        Matrix activation = input;
-        ArrayList<Matrix> activations = new ArrayList<>();
-        activations.add(activation);
-
-        ArrayList<Matrix> zs = new ArrayList<>();
-
-        for(int i = 0; i < this.biases.size(); i++)
-        {
-            weight = this.weights.get(i);
-            bias = this.biases.get(i);
-
-            Matrix z = weight.multiply(activation).add(bias);
-            zs.add(z);
-            activation = z.applyFunction(NeuralNetwork::sigmoid);
-            activations.add(activation);
-        }
+		ArrayList<Matrix> zs = zsAndActivations.getFirstElement();
+		ArrayList<Matrix> activations = zsAndActivations.getSecondElement();
+        
 
         //Backward pass
         Matrix delta = this.costDerivative(activations.get(activations.size() - 1), output).
@@ -201,6 +173,7 @@ public class NeuralNetwork
                                     zs.get(zs.size()-1).
                                     applyFunction(NeuralNetwork::sigmoidPrime)
                             );
+
 
         nabla_b.set(nabla_b.size()-1, delta);
         nabla_w.set(nabla_w.size()-1,  delta.multiply(activations.get(activations.size() - 2).transpose()) );
@@ -226,6 +199,34 @@ public class NeuralNetwork
         return results;
     }
 
+	//Returns the zs and activations for the input matrix using the current biases and weights
+	//firstElement is zs, second element is activations
+	private Pair<ArrayList<Matrix>, ArrayList<Matrix>> calculateActivations(Matrix input)
+	{
+		Matrix weight = null;
+		Matrix bias = null;
+		
+		ArrayList<Matrix> zs = new ArrayList<>();
+		ArrayList<Matrix> activations = new ArrayList<>();
+	
+		Matrix activation = input;
+		
+		activations.add(activation);
+	
+	    for(int i = 0; i < this.biases.size(); i++)
+        {
+            weight = this.weights.get(i);
+            bias = this.biases.get(i);
+
+            Matrix z = weight.multiply(activation).add(bias);
+            zs.add(z);
+            activation = z.applyFunction(NeuralNetwork::sigmoid);
+            activations.add(activation);
+        }
+        
+        return new Pair(zs, activations);
+	}
+
     public int evaluate(List<Pair<Matrix, Matrix>> testData)
     {
         List<Integer> testResults = new ArrayList<>();
@@ -241,6 +242,7 @@ public class NeuralNetwork
 
         int totalCorrect = 0;
 
+		//TODO make this a separate method
         for(int i = 0; i < testData.size(); i++)
         {
             if( testResults.get(i) == this.getNonZeroRow(testData.get(i).getSecondElement()) )
@@ -275,12 +277,12 @@ public class NeuralNetwork
         return -1;
     }
 
-    private int getLargestRow(Matrix matrix)
+	private int getLargestRow(Matrix matrix)
     {
-        int largest = matrix.getRows() - 1;
+        int largest = 0;
         double largestValue = matrix.getEntry(largest, 0);
 
-        for(int i = matrix.getRows() - 1; i >= 0; i--)
+        for(int i = 0; i < matrix.getRows(); i++)
         {
             if( matrix.getEntry(i, 0) > largestValue)
             {
@@ -320,6 +322,18 @@ public class NeuralNetwork
 
         return builder.toString();
     }
+
+	private ArrayList<Matrix> createBlankCopy(List<Matrix> source)
+	{
+		ArrayList<Matrix> copy = new ArrayList<>(source.size());
+		
+		for(int i = 0; i < source.size(); i++)
+		{
+			copy.add(new Matrix(source.get(i).getRows(), source.get(i).getColumns()));
+		}
+		
+		return copy;
+	}
 
     private static double sigmoid(double input)
     {
