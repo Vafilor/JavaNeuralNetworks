@@ -29,7 +29,7 @@ public class Matrix {
     }
 
     public Matrix(int rows, int columns)
-    {
+    {    
         this.setRows(rows);
         this.setColumns(columns);
 
@@ -56,7 +56,7 @@ public class Matrix {
 
     public Matrix add(Matrix that)
     {
-        if(this.getRows() != that.getRows() || this.getColumns() != that.getColumns())
+        if( !Matrix.sameMatrixSize(this, that) )
         {
             throw new IllegalArgumentException("Matrix addition not defined for input matrices\n:" + this.getDimensions() + " x " + that.getDimensions());
         }
@@ -75,6 +75,11 @@ public class Matrix {
 
     public Matrix addInto(Matrix that)
     {
+        if( !Matrix.sameMatrixSize(this, that) )
+        {
+            throw new IllegalArgumentException("Matrix addition not defined for input matrices\n:" + this.getDimensions() + " x " + that.getDimensions());
+        }
+    
         for(int i = 0; i < this.rows; i++)
         {
             for (int j = 0; j < this.columns; j++) {
@@ -87,6 +92,11 @@ public class Matrix {
 
     public Matrix subtractInto(Matrix that)
     {
+    	if( !Matrix.sameMatrixSize(this, that) )
+        {
+            throw new IllegalArgumentException("Matrix subtraction not defined for input matrices\n:" + this.getDimensions() + " x " + that.getDimensions());
+        }
+    
         for(int i = 0; i < this.rows; i++)
         {
             for (int j = 0; j < this.columns; j++) {
@@ -99,6 +109,11 @@ public class Matrix {
 
     public Matrix subtract(Matrix that)
     {
+        if( !Matrix.sameMatrixSize(this, that) )
+        {
+            throw new IllegalArgumentException("Matrix subtraction not defined for input matrices\n:" + this.getDimensions() + " x " + that.getDimensions());
+        }
+    
         Matrix copy = new Matrix(this.rows, this.columns);
 
         for(int i = 0; i < this.rows; i++)
@@ -169,6 +184,11 @@ public class Matrix {
 
     public Matrix multiplyEntriesInto(Matrix that)
     {
+        if(this.getRows() != that.getRows() || this.getColumns() != that.getColumns())
+        {
+            throw new IllegalArgumentException("Matrix entry multplication not defined for input matrices\n:" + this.getDimensions() + " x " + that.getDimensions());
+        }
+        
         for (int i = 0; i < this.getRows(); i++) {
             for (int j = 0; j < this.getColumns(); j++) {
                 this.entries[i][j] = this.entries[i][j] * that.entries[i][j];
@@ -267,7 +287,7 @@ public class Matrix {
 
     private void setRows(int rows)
     {
-        if(rows < 0)
+        if(rows < 1)
         {
             throw new IllegalArgumentException("rows < 0");
         }
@@ -277,11 +297,16 @@ public class Matrix {
 
     private void setColumns(int columns)
     {
-        if(columns < 0)
+        if(columns < 1)
         {
             throw new IllegalArgumentException("columns < 0 ");
         }
 
         this.columns = columns;
+    }
+    
+    public static boolean sameMatrixSize(Matrix a, Matrix b)
+    {
+		return (a.rows != b.rows) || (a.columns != b.columns);
     }
 }
