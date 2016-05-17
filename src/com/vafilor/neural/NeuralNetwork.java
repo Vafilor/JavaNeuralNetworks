@@ -86,24 +86,8 @@ public class NeuralNetwork
 
     public void updateMiniBatch(List<Pair<Matrix,Matrix>> miniBatch, double eta)
     {
-        ArrayList<Matrix> nabla_b = new ArrayList<>();
-
-        Matrix weight = null;
-        Matrix bias = null;
-
-        for(int i = 0; i < this.biases.size(); i++)
-        {
-            bias = this.biases.get(i);
-            nabla_b.add(new Matrix(bias.getRows(), bias.getColumns()));
-        }
-
-        ArrayList<Matrix> nabla_w = new ArrayList<>();
-
-        for(int i = 0; i < this.weights.size(); i++)
-        {
-            weight = this.weights.get(i);
-            nabla_w.add(new Matrix(weight.getRows(), weight.getColumns()));
-        }
+        ArrayList<Matrix> nabla_b = this.createBlankCopy(this.biases);
+        ArrayList<Matrix> nabla_w = this.createBlankCopy(this.weights);
 
         Pair<Matrix, Matrix> pair = null;
 
@@ -119,15 +103,8 @@ public class NeuralNetwork
             delta_nabla_b = result.get(0);
             delta_nabla_w = result.get(1);
 
-            for(int j = 0; j < nabla_b.size(); j++)
-            {
-                nabla_b.get(j).addInto(delta_nabla_b.get(j));
-            }
-
-            for(int k = 0; k < nabla_w.size(); k++)
-            {
-                nabla_w.get(k).addInto(delta_nabla_w.get(k));
-            }
+			this.addInto(nabla_b, delta_nabla_b);
+			this.addInto(nabla_w, delta_nabla_w);
         }
 
         Matrix w = null;
@@ -333,6 +310,16 @@ public class NeuralNetwork
 		}
 		
 		return copy;
+	}
+
+	//Modifies the entries in destination by adding the entries in delta. 
+	//At the end, ith entry in destination = ith entry in old + ith entry in delta
+	private void addInto(List<Matrix> destination, List<Matrix> delta)
+	{
+		for(int i = 0; i < destination.size(); i++)
+		{
+			destination.get(i).addInto(delta.get(i));
+		}
 	}
 
     private static double sigmoid(double input)
