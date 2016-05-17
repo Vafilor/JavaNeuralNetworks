@@ -52,8 +52,6 @@ public class NeuralNetwork
     {
         int n = trainingData.size();
 
-
-
         for(int i = 1; i <= epochs; i++)
         {
             List<List<Pair<Matrix,Matrix>>> miniBatches = new ArrayList<>();
@@ -61,14 +59,7 @@ public class NeuralNetwork
 
             for(int j = 0; j < n; j += miniBatchSize)
             {
-                List<Pair<Matrix,Matrix>> mini = new ArrayList<>();
-
-                for(int k = j; k < j + miniBatchSize; k++ )
-                {
-                    mini.add(trainingData.get(k));
-                }
-
-                miniBatches.add(mini);
+                miniBatches.add(trainingData.subList(j, j + miniBatchSize));
             }
 
             for(List<Pair<Matrix,Matrix>> miniBatch : miniBatches)
