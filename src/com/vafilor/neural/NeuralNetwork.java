@@ -98,10 +98,10 @@ public class NeuralNetwork
         {
             pair = miniBatch.get(i);
 
-            ArrayList<ArrayList<Matrix>> result = this.backprop(pair.getFirstElement(), pair.getSecondElement());
+            Pair<ArrayList<Matrix>, ArrayList<Matrix>> result = this.backprop(pair.getFirstElement(), pair.getSecondElement());
 
-            delta_nabla_b = result.get(0);
-            delta_nabla_w = result.get(1);
+            delta_nabla_b = result.getFirstElement();
+            delta_nabla_w = result.getSecondElement();
 
 			this.addInto(nabla_b, delta_nabla_b);
 			this.addInto(nabla_w, delta_nabla_w);
@@ -133,7 +133,7 @@ public class NeuralNetwork
      * @return
      */
     //TODO change to use pair
-    public ArrayList<ArrayList<Matrix>> backprop(Matrix input, Matrix output)
+    public Pair<ArrayList<Matrix>, ArrayList<Matrix>> backprop(Matrix input, Matrix output)
     {
         ArrayList<Matrix> nabla_b = this.createBlankCopy(this.biases);
 		ArrayList<Matrix> nabla_w = this.createBlankCopy(this.weights);
@@ -168,12 +168,7 @@ public class NeuralNetwork
             nabla_w.set(nabla_w.size() - i, delta.multiply(activations.get(activations.size() - i - 1).transpose()) );
         }
 
-        ArrayList<ArrayList<Matrix>> results = new ArrayList<ArrayList<Matrix>>();
-        results.add(nabla_b);
-        results.add(nabla_w);
-        //TODO why List<List<Matrix>> not work here?
-
-        return results;
+		return new Pair<ArrayList<Matrix>, ArrayList<Matrix>>( nabla_b, nabla_w );
     }
 
 	//Returns the zs and activations for the input matrix using the current biases and weights
