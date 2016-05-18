@@ -56,7 +56,9 @@ public class ImageReader
                 image = new Matrix(rows * columns, 1);
 
                 for (int j = 0; j < pixelsInImage; j++) {
-                    image.setEntry(j, 0, pixelValues[i + j] & 0xFF); //We bitwise and here with 0xFF to convert java's signed byte to 'unsigned' byte, which is really an int.
+					//We bitwise an here to convert java's signed byte to 'unsigned' byte, really an int here.
+					//Also we divide by 256.0 to make the value be from [0,1), as the network should have each output in that range.
+                    image.setEntry(j, 0, (pixelValues[i + j] & 0xFF) / 256.0); 
                 }
 
                 imagesAsVectors.add(image);
