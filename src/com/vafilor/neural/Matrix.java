@@ -307,6 +307,6 @@ public class Matrix {
     
     public static boolean sameMatrixSize(Matrix a, Matrix b)
     {
-		return (a.rows != b.rows) || (a.columns != b.columns);
+		return (a.rows == b.rows) && (a.columns == b.columns);
     }
 }
